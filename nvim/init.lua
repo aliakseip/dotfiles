@@ -7,3 +7,6 @@ require("core.lazy")
 
 -- Load all features in one go
 require("features")
+
+-- Load all experiments (optional)
+require("experiments")
