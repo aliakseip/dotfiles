@@ -1,0 +1,3 @@
+nvim|symlink|.config
+ghostty|symlink|.config
+tmux|symlink|.config
