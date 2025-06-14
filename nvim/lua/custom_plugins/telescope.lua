@@ -51,7 +51,7 @@ return {
                 })
             end)
 
-            require("plugins.config.multigrep").setup()
+            require("lua.custom.multigrep").setup()
         end,
     },
     {

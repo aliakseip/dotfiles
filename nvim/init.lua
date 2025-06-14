@@ -1,12 +1,10 @@
 -- Load core settings and keymaps early
 require("core.options")
 require("core.remaps")
+require("core.config")
 
 -- Setup plugin manager and plugins
 require("core.lazy")
 
--- Load all features in one go
-require("features")
-
--- Load all experiments (optional)
-require("experiments")
+-- Load all custom plugins
+require("custom_plugins")
