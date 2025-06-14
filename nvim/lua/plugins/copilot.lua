@@ -1,22 +1,22 @@
 return {
-    {
-        "zbirenbaum/copilot.lua",
-        cmd = "Copilot",
-        build = ":Copilot auth",
-        event = "InsertEnter",
-        config = function()
-            require("copilot").setup({
-                suggestion = {
-                    auto_trigger = true,
-                    debounce = 100,
-                    keymap = {
-                        accept = "<C-l>",
-                    },
-                },
-            })
-
-            vim.keymap.set("n", "<space>cpd", ":Copilot disable<cr>", { silent = true, noremap = true })
-            vim.keymap.set("n", "<space>cpe", ":Copilot enable<cr>", { silent = true, noremap = true })
-        end,
-    },
+    -- {
+    --     "zbirenbaum/copilot.lua",
+    --     cmd = "Copilot",
+    --     build = ":Copilot auth",
+    --     event = "InsertEnter",
+    --     config = function()
+    --         require("copilot").setup({
+    --             suggestion = {
+    --                 auto_trigger = true,
+    --                 debounce = 100,
+    --                 keymap = {
+    --                     accept = "<C-l>",
+    --                 },
+    --             },
+    --         })
+    --
+    --         vim.keymap.set("n", "<space>cpd", ":Copilot disable<cr>", { silent = true, noremap = true })
+    --         vim.keymap.set("n", "<space>cpe", ":Copilot enable<cr>", { silent = true, noremap = true })
+    --     end,
+    -- },
 }
