@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
 set -euo pipefail
 
@@ -20,7 +20,7 @@ synlinkFile() {
         exit 1
     fi
 
-    ln -s "$filename" "$destination"
+    ln -sf "$filename" "$destination"
     echo "[OK] $filename -> $destination"
 }
 
