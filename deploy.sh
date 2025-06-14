@@ -11,17 +11,17 @@ synlinkFile() {
     mkdir -p $(dirname "$destination")
 
     if [ -L "$destination" ]; then
-        echo "[WARNING] $filename already symlinked"
+        echo "[WARN] $filename already symlinked"
         return
     fi
 
     if [ -e "$destination" ]; then
-        echo "[ERROR] $destination exists but it's not a symlink. Please fix that manually"
+        echo "[FAIL] $destination exists but it's not a symlink. Please fix that manually"
         exit 1
     fi
 
     ln -sf "$filename" "$destination"
-    echo "[OK] $filename -> $destination"
+    echo "[ OK ] $filename -> $destination"
 }
 
 deployManifest() {
@@ -39,7 +39,7 @@ deployManifest() {
                 synlinkFile $filename $destination
                 ;;
             *)
-                echo "[WARNING] Unknown operation $operation. Skipping ..."
+                echo "[WARN] Unknown operation $operation. Skipping ..."
                 ;;
         esac
     done
