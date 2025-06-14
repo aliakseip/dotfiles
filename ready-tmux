@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+tmux new-window -d -n "scratch"
+nvim .
