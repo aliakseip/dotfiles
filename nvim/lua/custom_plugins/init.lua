@@ -1,4 +1,4 @@
-local custom_plugins_list = { }
+local custom_plugins_list = { "floaterminal" }
 
 for _, custom_plugin in ipairs(custom_plugins_list) do
   local ok, mod = pcall(require, "custom_plugins." .. custom_plugin)
