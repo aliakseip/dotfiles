@@ -1,3 +1,6 @@
 nvim|symlink|.config
 ghostty|symlink|.config
 tmux|symlink|.config
+ready-tmux|symlink|.local/bin
+tmux-sessionizer|symlink|.local/bin
+#.zsh_profile|symlink|
