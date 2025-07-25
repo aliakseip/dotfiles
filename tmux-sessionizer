@@ -3,7 +3,7 @@
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(fd --type d --max-depth 1 . ~/work ~/personal | fzf)
+    selected=$(fd --type d --max-depth 2 . ~/work ~/personal | fzf)
 fi
 
 if [[ -z "$selected" ]]; then
