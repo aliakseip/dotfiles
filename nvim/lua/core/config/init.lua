@@ -1,4 +1,4 @@
-local config_list = { "menu", "terminal" }
+local config_list = { "filetype", "menu", "terminal" }
 
 for _, config in ipairs(config_list) do
 	local ok, mod = pcall(require, "core.config." .. config)
