@@ -29,6 +29,13 @@ vim.keymap.set("i", "<C-c>", "<Esc>")
 vim.keymap.set("n", "<space>w", "<cmd>!chmod +x %<CR>", { silent = true })
 vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>")
 
+vim.keymap.set("n", "<Leader>ds", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+vim.keymap.set("n", "<Leader>dv", function()
+    local current_config = vim.diagnostic.config()
+    local has_virtual_text = current_config and current_config.virtual_text
+    vim.diagnostic.config({ virtual_text = not has_virtual_text })
+end, { desc = "Toggle diagnostics virtual text" })
+
 vim.api.nvim_create_autocmd('TextYankPost', {
     desc = 'Highlight when yanking (coping) text',
     group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
@@ -46,15 +53,18 @@ end)
 
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-    vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        "--branch=stable",
-        lazypath,
-    })
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -66,7 +76,7 @@ require("lazy").setup({
             "junegunn/fzf",
         },
         config = function()
-            vim.keymap.set("n", "<C-p>", "<Cmd>Files<CR>", { desc = "Find files" })
+            vim.keymap.set("n", "<Leader>f", "<Cmd>Files<CR>", { desc = "Find files" })
             vim.keymap.set("n", "<Leader>,", "<Cmd>Buffers<CR>", { desc = "Find buffers" })
             vim.keymap.set("n", "<Leader>/", "<Cmd>Rg<CR>", { desc = "Search project" })
         end,
@@ -78,64 +88,64 @@ require("lazy").setup({
         config = function()
             vim.cmd.colorscheme("gruvbuddy")
         end,
-   },
-   {
-	   "tjdevries/express_line.nvim",
-       dependencies = { "nvim-lua/plenary.nvim" },
-       config = function()
-           local builtin = require "el.builtin"
-           local extensions = require "el.extensions"
-           local subscribe = require "el.subscribe"
-           local sections = require "el.sections"
+    },
+    {
+        "tjdevries/express_line.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        config = function()
+            local builtin = require "el.builtin"
+            local extensions = require "el.extensions"
+            local subscribe = require "el.subscribe"
+            local sections = require "el.sections"
 
-       require("el").setup {
-        generator = function()
-          local segments = {}
+            require("el").setup {
+                generator = function()
+                    local segments = {}
 
-          table.insert(segments, extensions.mode)
-          table.insert(segments, " ")
-          table.insert(
-            segments,
-            subscribe.buf_autocmd("el-git-branch", "BufEnter", function(win, buf)
-              local branch = extensions.git_branch(win, buf)
-              if branch then
-                return branch
-              end
-            end)
-          )
-          table.insert(
-            segments,
-            subscribe.buf_autocmd("el-git-changes", "BufWritePost", function(win, buf)
-              local changes = extensions.git_changes(win, buf)
-              if changes then
-                return changes
-              end
-            end)
-          )
-          table.insert(segments, function()
-            local task_count = #require("misery.scheduler").tasks
-            if task_count == 0 then
-              return ""
-            else
-              return string.format(" (Queued Events: %d)", task_count)
-            end
-          end)
-          table.insert(segments, sections.split)
-          table.insert(segments, "%f")
-          table.insert(segments, sections.split)
-          table.insert(segments, builtin.filetype)
-          table.insert(segments, "[")
-          table.insert(segments, builtin.line_with_width(3))
-          table.insert(segments, ":")
-          table.insert(segments, builtin.column_with_width(2))
-          table.insert(segments, "]")
+                    table.insert(segments, extensions.mode)
+                    table.insert(segments, " ")
+                    table.insert(
+                        segments,
+                        subscribe.buf_autocmd("el-git-branch", "BufEnter", function(win, buf)
+                            local branch = extensions.git_branch(win, buf)
+                            if branch then
+                                return branch
+                            end
+                        end)
+                    )
+                    table.insert(
+                        segments,
+                        subscribe.buf_autocmd("el-git-changes", "BufWritePost", function(win, buf)
+                            local changes = extensions.git_changes(win, buf)
+                            if changes then
+                                return changes
+                            end
+                        end)
+                    )
+                    table.insert(segments, function()
+                        local task_count = #require("misery.scheduler").tasks
+                        if task_count == 0 then
+                            return ""
+                        else
+                            return string.format(" (Queued Events: %d)", task_count)
+                        end
+                    end)
+                    table.insert(segments, sections.split)
+                    table.insert(segments, "%f")
+                    table.insert(segments, sections.split)
+                    table.insert(segments, builtin.filetype)
+                    table.insert(segments, "[")
+                    table.insert(segments, builtin.line_with_width(3))
+                    table.insert(segments, ":")
+                    table.insert(segments, builtin.column_with_width(2))
+                    table.insert(segments, "]")
 
-          return segments
+                    return segments
+                end,
+            }
         end,
-      }
-    end,
-  },
-   {
+    },
+    {
         "stevearc/oil.nvim",
         config = function()
             require("oil").setup({
@@ -144,11 +154,11 @@ require("lazy").setup({
                     show_hidden = true,
                 },
             })
-            vim.keymap.set("n", "-", "<Cmd>Oil<CR>", { desc = "Browse files from here"} )
+            vim.keymap.set("n", "-", "<Cmd>Oil<CR>", { desc = "Browse files from here" })
             vim.keymap.set("n", "<space>-", require("oil").toggle_float)
         end,
     },
-     {
+    {
         "windwp/nvim-autopairs",
         event = "InsertEnter", -- Only load when you enter Insert mode
         config = function()
@@ -157,7 +167,7 @@ require("lazy").setup({
     },
     {
         "numToStr/Comment.nvim",
-        event = "VeryLazy", -- Special lazy.nvim event for things that can load later and are not important for the initial UI
+        event = "VeryLazy",
         config = function()
             require("Comment").setup()
         end,
@@ -169,5 +179,24 @@ require("lazy").setup({
             vim.keymap.set("n", "<space>u", vim.cmd.UndotreeToggle)
         end
     },
+    {
+        "lewis6991/gitsigns.nvim",
+    },
+    {
+        "neovim/nvim-lspconfig",
+        dependencies = {
+            {
+                "folke/lazydev.nvim",
+                ft = "lua",
+                opts = {
+                    library = {
+                        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+                    },
+                },
+            },
+        },
+        config = function()
+            vim.lsp.enable({ "lua_ls", "pyright", "gopls" })
+        end,
+    },
 })
-
