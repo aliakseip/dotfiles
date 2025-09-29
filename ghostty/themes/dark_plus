@@ -1,7 +1,8 @@
 # Ghostty theme file for VSCode Dark+ approximation
 
 # Core colors
-background = #0E0E0E
+# background = #20242C
+background = #111111
 foreground = #D4D4D4
 cursor-color = #AEAFAD
 selection-background = #264F78
