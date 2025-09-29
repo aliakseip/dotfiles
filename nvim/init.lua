@@ -8,6 +8,7 @@ vim.opt.expandtab = true
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 0
 vim.opt.cursorline = true
+vim.opt.laststatus = 3
 
 vim.keymap.set("n", "<space><space>x", "<cmd>source %<CR>")
 vim.keymap.set("n", "<bs>", "<cmd>noh<CR>")
@@ -44,46 +45,6 @@ vim.keymap.set("n", "<space>st", function()
 end)
 
 
-vim.cmd([[
-    aunmenu PopUp
-    anoremenu PopUp.Inspect     <cmd>Inspect<CR>
-    amenu PopUp.-1-             <NOP>
-    anoremenu PopUp.Definition  <cmd>lua vim.lsp.buf.definition()<CR>
-    anoremenu PopUp.References  <cmd>Telescope lsp_references<CR>
-    nnoremenu PopUp.Back        <C-t>
-    amenu PopUp.-2-             <NOP>
-    amenu PopUp.URL             gx
-    ]])
-
-local group = vim.api.nvim_create_augroup("nvim_popupmenu", { clear = true })
-vim.api.nvim_create_autocmd("MenuPopup", {
-    pattern = "*",
-    group = group,
-    desc = "Custom PopUp Setup",
-    callback = function()
-        vim.cmd([[
-        amenu disable PopUp.Definition
-        amenu disable PopUp.References
-        amenu disable PopUp.URL
-    ]])
-        if vim.lsp.get_clients({ bufnr = 0 })[1] then
-            vim.cmd([[
-            amenu enable PopUp.Definition
-            amenu enable PopUp.References
-        ]])
-        end
-
-        local urls = require("vim.ui")._get_urls()
-        if vim.startswith(urls[1], "http") then
-            vim.cmd([[
-            amenu enable PopUp.URL
-        ]])
-        end
-    end,
-})
-
-vim.opt.laststatus = 3
-
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
     vim.fn.system({
@@ -99,16 +60,16 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "https://github.com/junegunn/fzf.vim",
+        "junegunn/fzf.vim",
         build = "./install --all",
         dependencies = {
-            "https://github.com/junegunn/fzf",
+            "junegunn/fzf",
         },
-        keys = {
-            { "<Leader><Leader>", "<Cmd>Files<CR>", desc = "Find files" },
-            { "<Leader>,", "<Cmd>Buffers<CR>", desc = "Find buffers" },
-            { "<Leader>/", "<Cmd>Rg<CR>", desc = "Search project" },
-        },
+        config = function()
+            vim.keymap.set("n", "<C-p>", "<Cmd>Files<CR>", { desc = "Find files" })
+            vim.keymap.set("n", "<Leader>,", "<Cmd>Buffers<CR>", { desc = "Find buffers" })
+            vim.keymap.set("n", "<Leader>/", "<Cmd>Rg<CR>", { desc = "Search project" })
+        end,
     },
     {
         "tjdevries/colorbuddy.nvim",
@@ -175,57 +136,30 @@ require("lazy").setup({
     end,
   },
    {
-        "https://github.com/stevearc/oil.nvim",
+        "stevearc/oil.nvim",
         config = function()
-            require("oil").setup()
+            require("oil").setup({
+                default_file_explorer = false,
+                view_options = {
+                    show_hidden = true,
+                },
+            })
+            vim.keymap.set("n", "-", "<Cmd>Oil<CR>", { desc = "Browse files from here"} )
+            vim.keymap.set("n", "<space>-", require("oil").toggle_float)
         end,
-        keys = {
-            { "-", "<Cmd>Oil<CR>", desc = "Browse files from here" },
-        },
     },
      {
-        "https://github.com/windwp/nvim-autopairs",
+        "windwp/nvim-autopairs",
         event = "InsertEnter", -- Only load when you enter Insert mode
         config = function()
             require("nvim-autopairs").setup()
         end,
     },
     {
-        "https://github.com/numToStr/Comment.nvim",
+        "numToStr/Comment.nvim",
         event = "VeryLazy", -- Special lazy.nvim event for things that can load later and are not important for the initial UI
         config = function()
             require("Comment").setup()
-        end,
-    },
-    {
-        "https://github.com/VonHeikemen/lsp-zero.nvim",
-        dependencies = {
-            "https://github.com/williamboman/mason.nvim",
-            "https://github.com/williamboman/mason-lspconfig.nvim",
-            "https://github.com/neovim/nvim-lspconfig",
-            "https://github.com/hrsh7th/cmp-nvim-lsp",
-            "https://github.com/hrsh7th/nvim-cmp",
-            "https://github.com/L3MON4D3/LuaSnip",
-        },
-        config = function()
-            local lsp_zero = require('lsp-zero')
-
-            lsp_zero.on_attach(function(client, bufnr)
-                lsp_zero.default_keymaps({buffer = bufnr})
-            end)
-
-            require("mason").setup()
-            require("mason-lspconfig").setup({
-                ensure_installed = {
-                    -- See https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
-                    "gopls", -- Go
-                    "pyright", -- Python
-                    "lua_ls",
-                },
-                handlers = {
-                    lsp_zero.default_setup,
-                },
-            })
         end,
     },
     {
