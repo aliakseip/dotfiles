@@ -76,13 +76,12 @@ require("lazy").setup({
             "junegunn/fzf",
         },
         config = function()
-            local keymap = vim.keymap.set
             local config_path = vim.fn.stdpath("config")
 
-            keymap("n", "<Leader>fd", "<Cmd>Files<CR>", { desc = "Find files" })
-            keymap("n", "<Leader>fb", "<Cmd>Buffers<CR>", { desc = "Find buffers" })
-            keymap("n", "<Leader>/", "<Cmd>Rg<CR>", { desc = "Search project" })
-            keymap("n", "<Leader>en", function()
+            vim.keymap.set("n", "<Leader>fd", "<Cmd>Files<CR>", { desc = "Find files" })
+            vim.keymap.set("n", "<Leader>fb", "<Cmd>Buffers<CR>", { desc = "Find buffers" })
+            vim.keymap.set("n", "<Leader>/", "<Cmd>Rg<CR>", { desc = "Search project" })
+            vim.keymap.set("n", "<Leader>en", function()
                 vim.cmd("Files " .. config_path)
             end, { desc = "Find in config" })
         end,
