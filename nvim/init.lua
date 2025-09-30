@@ -54,17 +54,17 @@ end)
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
+    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+    local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_echo({
+            { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+            { out,                            "WarningMsg" },
+            { "\nPress any key to exit..." },
+        }, true, {})
+        vim.fn.getchar()
+        os.exit(1)
+    end
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -183,8 +183,23 @@ require("lazy").setup({
         "lewis6991/gitsigns.nvim",
     },
     {
+        "saghen/blink.cmp",
+        dependencies = { "rafamadriz/friendly-snippets" },
+
+        version = "1.*",
+        opts = {
+            keymap = { preset = "default" },
+
+            appearance = {
+                nerd_font_variant = "mono"
+            },
+
+        },
+    },
+    {
         "neovim/nvim-lspconfig",
         dependencies = {
+            "saghen/blink.cmp",
             {
                 "folke/lazydev.nvim",
                 ft = "lua",
@@ -196,7 +211,35 @@ require("lazy").setup({
             },
         },
         config = function()
-            vim.lsp.enable({ "lua_ls", "pyright", "gopls" })
+            local capabilities = require("blink.cmp").get_lsp_capabilities()
+            local servers = { "lua_ls", "pyright", "gopls" }
+
+            for _, server in ipairs(servers) do
+                vim.lsp.config(server, {
+                    capabilities = vim.tbl_deep_extend("force", {}, capabilities),
+                })
+            end
+            vim.lsp.enable(servers)
+
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = vim.api.nvim_create_augroup("my.lsp", {}),
+                callback = function(args)
+                    local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+                    if vim.tbl_contains({ "lua", "go" }, vim.bo.filetype) then
+                        if not client:supports_method("textDocument/willSaveWaitUntil")
+                            and client:supports_method("textDocument/formatting") then
+                            vim.api.nvim_create_autocmd("BufWritePre", {
+                                group = vim.api.nvim_create_augroup("my.lsp", { clear = false }),
+                                buffer = args.buf,
+                                callback = function()
+                                    vim.lsp.buf.format({ bufnr = args.buf, id = client.id, timeout_ms = 1000 })
+                                end,
+                            })
+                        end
+                    end
+                end,
+            })
         end,
+
     },
 })
