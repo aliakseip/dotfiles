@@ -19,4 +19,5 @@ vim.opt.listchars = {
     nbsp = "␣",
     extends = "›",
     precedes = "‹",
+    conceal = '┊',
 }
