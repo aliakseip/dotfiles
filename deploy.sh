@@ -6,7 +6,14 @@ DOT_FILES_DIR=$(dirname $(realpath "${(%):-%x}"))
 
 synlinkFile() {
     filename="$DOT_FILES_DIR/$1"
-    destination="$HOME/$2/$1"
+
+    if (( ${+2} )); then
+	destination="$HOME/$2/$1"	
+    else
+        destination="$HOME/$1"
+    fi
+
+
 
     mkdir -p $(dirname "$destination")
 
@@ -34,6 +41,7 @@ deployManifest() {
         operation=$(echo $row | cut -d \| -f 2)
         destination=$(echo $row | cut -d \| -f 3)
 
+	echo "test" $destination
         case $operation in
             symlink)
                 synlinkFile $filename $destination
