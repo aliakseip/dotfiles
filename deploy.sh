@@ -7,13 +7,11 @@ DOT_FILES_DIR=$(dirname $(realpath "${(%):-%x}"))
 synlinkFile() {
     filename="$DOT_FILES_DIR/$1"
 
-    if (( ${+2} )); then
-	destination="$HOME/$2/$1"	
+    if [ "$#" -ge 2 ] && [ -n "$2" ]; then
+        destination="$HOME/$2/$1"
     else
         destination="$HOME/$1"
     fi
-
-
 
     mkdir -p $(dirname "$destination")
 
