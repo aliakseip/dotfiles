@@ -4,3 +4,7 @@ require("config.autocmds")
 require("config.menu")
 require("config.lazy")
 require("config.telescope.multigrep").setup()
+
+vim.api.nvim_create_user_command("RunC", function()
+    vim.cmd("split | terminal cc -o %< % && ./%<")
+end, {})
