@@ -29,8 +29,7 @@
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 
-;; (add-to-list 'load-path "/Users/apashkouski/personal/simpc-mode/")
-(load "~/.emacs.rc/simpc-mode/simpc-mode.el")
+(load "~/.emacs.rc/simpc-mode.el")
 (require 'simpc-mode)
 
 (add-to-list 'auto-mode-alist '("\\.[hc]\\(pp\\)?\\'" . simpc-mode))
